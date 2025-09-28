@@ -3,6 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import Config
+from .models import User
+
+@login.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 db = SQLAlchemy()
 migrate = Migrate()
