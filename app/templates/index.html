@@ -1,1 +1,9 @@
-{% extends 'base.html' %}{% block content %}<h1>Rezepte</h1>{% endblock %}
+{% extends 'base.html' %}
+{% block content %}
+<h1>Letzte Rezepte</h1>
+<ul>
+  {% for r in recipes %}
+    <li><a href="/recipes/{{ r.id }}">{{ r.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
