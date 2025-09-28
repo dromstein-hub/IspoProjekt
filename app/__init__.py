@@ -3,22 +3,25 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from config import Config
-from .models import User, Recipe
 
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
-login.login_view = "auth.login"  # make sure your auth blueprint has a login route
+login.login_view = "auth.login"
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Initialize extensions with app
+    # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
+
+    # Import models here to avoid circular import
+    from . import models
+    from .models import User, Recipe
 
     # Flask-Login user loader
     @login.user_loader
@@ -34,10 +37,9 @@ def create_app():
     app.register_blueprint(recipes_bp, url_prefix="/recipes")
     app.register_blueprint(api_bp, url_prefix="/api")
 
-    # Home page route
+    # Home route
     @app.route("/")
     def index():
-        # Fetch latest 10 recipes
         recipes = Recipe.query.order_by(Recipe.created_at.desc()).limit(10).all()
         return render_template("index.html", recipes=recipes)
 
