@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Rezepte Übersicht{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Rezepte</h1>
+  <a href="{{ url_for('recipes.new') }}" class="btn btn-primary">+ Neues Rezept</a>
+</div>
+<div class="row">
+  {% for recipe in recipes %}
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ recipe.title }}</h5>
+          <h6 class="card-subtitle text-muted mb-2">von {{ recipe.user.username }}</h6>
+          <p class="card-text">{{ recipe.description[:100] }}...</p>
+        </div>
+        <div class="card-footer">
+          <a href="{{ url_for('recipes.view', recipe_id=recipe.id) }}" class="btn btn-sm btn-outline-primary">Ansehen</a>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>Keine Rezepte vorhanden.</p>
+  {% endfor %}
+</div>
+{% endblock %}

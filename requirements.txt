@@ -1,11 +1,5 @@
-Flask>=2.2
-Flask-Login
-Flask-WTF
-Flask-Migrate
-Flask-SQLAlchemy
-psycopg2-binary
-gunicorn
-python-dotenv
-PyJWT
-bcrypt
-email-validator
+flask
+flask_sqlalchemy
+flask_login
+flask_wtf
+email_validator
