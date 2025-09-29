@@ -1,1 +1,27 @@
-{% extends 'base.html' %}{% block content %}<form>Neues Rezept</form>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Neues Rezept{% endblock %}
+{% block content %}
+<div class="card shadow-sm p-4">
+  <h2>Neues Rezept</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label">Titel</label>
+      <input type="text" class="form-control" name="title" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Beschreibung</label>
+      <textarea class="form-control" name="description"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Zutaten</label>
+      <textarea class="form-control" name="ingredients"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Anleitung</label>
+      <textarea class="form-control" name="instructions"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Speichern</button>
+    <a href="{{ url_for('recipes.index') }}" class="btn btn-secondary">Abbrechen</a>
+  </form>
+</div>
+{% endblock %}
