@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Mein Profil{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm p-4">
+      <div class="text-center mb-3">
+        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+          {{ current_user.username[0].upper() }}
+        </div>
+      </div>
+      <h3 class="text-center">{{ current_user.username }}</h3>
+      <p class="text-muted text-center">{{ current_user.email }}</p>
+      <hr>
+      <div class="d-flex justify-content-between mb-2">
+        <span><strong>Rezepte:</strong></span>
+        <span class="badge bg-primary">{{ user_recipes|length }}</span>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <span><strong>Favoriten:</strong></span>
+        <span class="badge bg-danger">{{ favorite_recipes|length }}</span>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <span><strong>Kommentare:</strong></span>
+        <span class="badge bg-info">{{ current_user.comments.count() }}</span>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <span><strong>Bewertungen:</strong></span>
+        <span class="badge bg-warning">{{ current_user.ratings.count() }}</span>
+      </div>
+      <hr>
+      <p class="text-muted small text-center">Mitglied seit {{ current_user.created_at.strftime('%d.%m.%Y') }}</p>
+      {% if current_user.is_admin %}
+        <span class="badge bg-danger d-block text-center">Admin</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="recipes-tab" data-bs-toggle="tab" data-bs-target="#recipes" type="button" role="tab">
+          Meine Rezepte ({{ user_recipes|length }})
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="favorites-tab" data-bs-toggle="tab" data-bs-target="#favorites" type="button" role="tab">
+          Favoriten ({{ favorite_recipes|length }})
+        </button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="profileTabsContent">
+      <!-- Meine Rezepte Tab -->
+      <div class="tab-pane fade show active" id="recipes" role="tabpanel">
+        {% if user_recipes %}
+          <div class="row">
+            {% for recipe in user_recipes %}
+              <div class="col-md-6 mb-3">
+                <div class="card shadow-sm h-100">
+                  <img
+                    src="{{ recipe.image_url if recipe.image_url else 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop' }}"
+                    class="card-img-top"
+                    alt="{{ recipe.title }}"
+                    style="height: 120px; object-fit: cover;"
+                  >
+                  <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                      <div class="text-warning small">
+                        {% for i in range(5) %}
+                          {% if i < recipe.average_rating() %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                        ({{ recipe.rating_count() }})
+                      </div>
+                      <div class="small text-danger">♥ {{ recipe.favorites.count() }}</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <a href="{{ url_for('recipes.view', recipe_id=recipe.id) }}" class="btn btn-sm btn-outline-primary">Ansehen</a>
+                      <a href="{{ url_for('recipes.edit', recipe_id=recipe.id) }}" class="btn btn-sm btn-warning">Bearbeiten</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-info">
+            Du hast noch keine Rezepte erstellt.
+            <a href="{{ url_for('recipes.create') }}" class="alert-link">Erstelle dein erstes Rezept!</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Favoriten Tab -->
+      <div class="tab-pane fade" id="favorites" role="tabpanel">
+        {% if favorite_recipes %}
+          <div class="row">
+            {% for recipe in favorite_recipes %}
+              <div class="col-md-6 mb-3">
+                <div class="card shadow-sm h-100">
+                  <img
+                    src="{{ recipe.image_url if recipe.image_url else 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop' }}"
+                    class="card-img-top"
+                    alt="{{ recipe.title }}"
+                    style="height: 120px; object-fit: cover;"
+                  >
+                  <div class="card-body">
+                    <h5 class="card-title">{{ recipe.title }}</h5>
+                    <h6 class="card-subtitle text-muted mb-2">von {{ recipe.author.username }}</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                      <div class="text-warning small">
+                        {% for i in range(5) %}
+                          {% if i < recipe.average_rating() %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                        ({{ recipe.rating_count() }})
+                      </div>
+                      <div class="small text-danger">♥ {{ recipe.favorites.count() }}</div>
+                    </div>
+                    <a href="{{ url_for('recipes.view', recipe_id=recipe.id) }}" class="btn btn-sm btn-outline-primary">Ansehen</a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-info">
+            Du hast noch keine Favoriten.
+            <a href="{{ url_for('recipes.index') }}" class="alert-link">Schau dir die Rezepte an!</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

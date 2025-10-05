@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Rezept bearbeiten{% endblock %}
+{% block content %}
+<div class="card shadow-sm p-4">
+  <h2>Rezept bearbeiten</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label class="form-label">Titel</label>
+      <input type="text" class="form-control" name="title" value="{{ recipe.title }}" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Beschreibung</label>
+      <textarea class="form-control" name="description" rows="3">{{ recipe.description }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Zutaten</label>
+      <textarea class="form-control" name="ingredients" rows="5">{{ recipe.ingredients }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Anleitung</label>
+      <textarea class="form-control" name="steps" rows="5">{{ recipe.steps }}</textarea>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Kategorie</label>
+        <input type="text" class="form-control" name="category" value="{{ recipe.category }}">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Dauer (Minuten)</label>
+        <input type="number" class="form-control" name="duration" value="{{ recipe.duration_min }}">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Schwierigkeit</label>
+        <select class="form-control" name="difficulty">
+          <option value="">-- Wählen --</option>
+          <option value="Einfach" {% if recipe.difficulty == "Einfach" %}selected{% endif %}>Einfach</option>
+          <option value="Mittel" {% if recipe.difficulty == "Mittel" %}selected{% endif %}>Mittel</option>
+          <option value="Schwer" {% if recipe.difficulty == "Schwer" %}selected{% endif %}>Schwer</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Bild</label>
+      {% if recipe.image_url %}
+        <div class="mb-2">
+          <img src="{{ recipe.image_url }}" class="img-thumbnail" style="max-width: 200px;" alt="Aktuelles Bild">
+          <p class="text-muted small">Aktuelles Bild (wird ersetzt wenn du ein neues hochlädst)</p>
+        </div>
+      {% endif %}
+      <input type="file" class="form-control" name="image" accept="image/*">
+    </div>
+    <button type="submit" class="btn btn-success">Speichern</button>
+    <a href="{{ url_for('recipes.view', recipe_id=recipe.id) }}" class="btn btn-secondary">Abbrechen</a>
+  </form>
+</div>
+{% endblock %}

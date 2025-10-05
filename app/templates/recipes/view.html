@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }}{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-8">
+    <div class="card shadow-sm p-4 mb-4">
+      <img
+        src="{{ recipe.image_url if recipe.image_url else 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop' }}"
+        alt="{{ recipe.title }}"
+        class="img-fluid rounded mb-3"
+        style="max-height: 400px; object-fit: cover; width: 100%;"
+      >
+
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h2>{{ recipe.title }}</h2>
+          <h6 class="text-muted">von {{ recipe.author.username }}</h6>
+        </div>
+        <div class="text-end">
+          <div class="text-warning mb-1">
+            {% for i in range(5) %}
+              {% if i < recipe.average_rating() %}
+                ★
+              {% else %}
+                ☆
+              {% endif %}
+            {% endfor %}
+            <small class="text-muted">({{ recipe.rating_count() }})</small>
+          </div>
+          <div class="small text-danger">♥ {{ recipe.favorites.count() }} Favoriten</div>
+        </div>
+      </div>
+
+      <hr>
+
+      {% if recipe.description %}
+        <p><strong>Beschreibung:</strong><br>{{ recipe.description }}</p>
+      {% endif %}
+
+      {% if recipe.ingredients %}
+        <p><strong>Zutaten:</strong><br>{{ recipe.ingredients|replace('\n', '<br>')|safe }}</p>
+      {% endif %}
+
+      {% if recipe.steps %}
+        <p><strong>Anleitung:</strong><br>{{ recipe.steps|replace('\n', '<br>')|safe }}</p>
+      {% endif %}
+
+      <div class="row mt-3">
+        {% if recipe.category %}
+          <div class="col-md-4">
+            <strong>Kategorie:</strong> {{ recipe.category }}
+          </div>
+        {% endif %}
+        {% if recipe.duration_min %}
+          <div class="col-md-4">
+            <strong>Dauer:</strong> {{ recipe.duration_min }} Min.
+          </div>
+        {% endif %}
+        {% if recipe.difficulty %}
+          <div class="col-md-4">
+            <strong>Schwierigkeit:</strong> {{ recipe.difficulty }}
+          </div>
+        {% endif %}
+      </div>
+
+      <hr>
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{{ url_for('recipes.index') }}" class="btn btn-secondary">Zurück</a>
+
+        {% if user_favorited %}
+          <form method="POST" action="{{ url_for('recipes.unfavorite', recipe_id=recipe.id) }}" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger">♥️ Aus Favoriten entfernen</button>
+          </form>
+        {% else %}
+          <form method="POST" action="{{ url_for('recipes.favorite', recipe_id=recipe.id) }}" class="d-inline">
+            <button type="submit" class="btn btn-outline-success">♡ Zu Favoriten hinzufügen</button>
+          </form>
+        {% endif %}
+
+        {% if current_user.id == recipe.created_by or current_user.is_admin %}
+          <a href="{{ url_for('recipes.edit', recipe_id=recipe.id) }}" class="btn btn-warning">Bearbeiten</a>
+          <form method="POST" action="{{ url_for('recipes.delete', recipe_id=recipe.id) }}" style="display: inline;" onsubmit="return confirm('Rezept wirklich löschen?');">
+            <button type="submit" class="btn btn-danger">Löschen</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <!-- Rating Card -->
+    <div class="card shadow-sm p-3 mb-3">
+      <h5>Bewerten</h5>
+      <form method="POST" action="{{ url_for('recipes.rate', recipe_id=recipe.id) }}">
+        <div class="btn-group btn-group-sm" role="group">
+          {% for i in range(1, 6) %}
+            <input type="radio" class="btn-check" name="stars" id="star{{ i }}" value="{{ i }}" {% if user_rating and user_rating.stars == i %}checked{% endif %} required>
+            <label class="btn btn-outline-warning" for="star{{ i }}">{{ i }}★</label>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-sm btn-primary mt-2 w-100">
+          {% if user_rating %}Bewertung ändern{% else %}Bewerten{% endif %}
+        </button>
+      </form>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="card shadow-sm p-3">
+      <h5>Kommentare ({{ comments|length }})</h5>
+      <form method="POST" action="{{ url_for('recipes.comment', recipe_id=recipe.id) }}" class="mb-3">
+        <textarea class="form-control mb-2" name="text" rows="3" placeholder="Dein Kommentar..." required></textarea>
+        <button type="submit" class="btn btn-sm btn-primary w-100">Kommentieren</button>
+      </form>
+
+      <hr>
+
+      {% for comment in comments %}
+        <div class="mb-3 pb-3 border-bottom">
+          <strong>{{ comment.author.username }}</strong>
+          <small class="text-muted">{{ comment.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+          <p class="mb-0 mt-1">{{ comment.text }}</p>
+        </div>
+      {% else %}
+        <p class="text-muted">Noch keine Kommentare</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

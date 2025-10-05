@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Neues Rezept{% endblock %}
+{% block content %}
+<div class="card shadow-sm p-4">
+  <h2>Neues Rezept</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label class="form-label">Titel *</label>
+      <input type="text" class="form-control" name="title" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Beschreibung</label>
+      <textarea class="form-control" name="description" rows="3"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Bild hochladen</label>
+      <input type="file" class="form-control" name="image" accept="image/*">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Zutaten</label>
+      <textarea class="form-control" name="ingredients" rows="5" placeholder="Jede Zutat in eine neue Zeile"></textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Anleitung</label>
+      <textarea class="form-control" name="steps" rows="5" placeholder="Schritte beschreiben"></textarea>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Kategorie</label>
+        <input type="text" class="form-control" name="category" placeholder="z.B. Dessert, Hauptgericht">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Dauer (Minuten)</label>
+        <input type="number" class="form-control" name="duration" min="1">
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Schwierigkeit</label>
+        <select class="form-control" name="difficulty">
+          <option value="">-- Wählen --</option>
+          <option value="Einfach">Einfach</option>
+          <option value="Mittel">Mittel</option>
+          <option value="Schwer">Schwer</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-success">Speichern</button>
+    <a href="{{ url_for('recipes.index') }}" class="btn btn-secondary">Abbrechen</a>
+  </form>
+</div>
+{% endblock %}

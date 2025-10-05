@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Startseite{% endblock %}
+{% block content %}
+<div class="text-center mt-5">
+  <h1>Willkommen zur Rezepte-App</h1>
+  <p class="lead mt-3">Teile deine Lieblingsrezepte mit der Community!</p>
+  <p>Bitte melde dich an oder registriere dich, um Rezepte zu sehen und zu erstellen.</p>
+  <div class="mt-4">
+    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg me-2">Login</a>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-success btn-lg">Registrieren</a>
+  </div>
+</div>
+{% endblock %}

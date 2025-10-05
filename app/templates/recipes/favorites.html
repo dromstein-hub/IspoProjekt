@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Meine Favoriten{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Meine Favoriten</h1>
+  <a href="{{ url_for('recipes.index') }}" class="btn btn-secondary">Zur Übersicht</a>
+</div>
+
+{% if recipes %}
+  <div class="row">
+    {% for recipe in recipes %}
+      <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+          <img
+            src="{{ recipe.image_url if recipe.image_url else 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop' }}"
+            class="card-img-top"
+            alt="{{ recipe.title }}"
+            style="height: 160px; object-fit: cover;"
+          >
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0">{{ recipe.title }}</h5>
+              {% if recipe.category %}
+                <span class="badge text-bg-secondary">{{ recipe.category }}</span>
+              {% endif %}
+            </div>
+            <h6 class="card-subtitle text-muted mb-2">von {{ recipe.author.username }}</h6>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="text-warning">
+                {% for i in range(5) %}
+                  {% if i < recipe.average_rating() %}★{% else %}☆{% endif %}
+                {% endfor %}
+                <small class="text-muted">({{ recipe.rating_count() }})</small>
+              </div>
+              <div class="small text-danger">♥ {{ recipe.favorites.count() }}</div>
+            </div>
+            {% if recipe.description %}
+              <p class="card-text">{{ recipe.description[:100] }}{% if recipe.description|length > 100 %}...{% endif %}</p>
+            {% endif %}
+          </div>
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('recipes.view', recipe_id=recipe.id) }}" class="btn btn-sm btn-outline-primary">Ansehen</a>
+            <form method="POST" action="{{ url_for('recipes.unfavorite', recipe_id=recipe.id) }}" class="mb-0">
+              <button type="submit" class="btn btn-sm btn-outline-danger">♥️ Entfernen</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">Du hast noch keine Favoriten. Schau dir die <a href="{{ url_for('recipes.index') }}">Rezepte</a> an und füge welche hinzu!</div>
+{% endif %}
+{% endblock %}

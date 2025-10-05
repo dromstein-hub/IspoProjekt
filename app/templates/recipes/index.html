@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Rezepte Übersicht{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Rezepte</h1>
+  <a href="{{ url_for('recipes.create') }}" class="btn btn-primary">+ Neues Rezept</a>
+</div>
+
+<!-- Filter & Sort -->
+<div class="card mb-4 p-3">
+  <form method="GET" class="row g-3">
+    <div class="col-md-5">
+      <label class="form-label">Kategorie</label>
+      <select name="category" class="form-control" onchange="this.form.submit()">
+        <option value="">Alle Kategorien</option>
+        {% for cat in categories %}
+          <option value="{{ cat }}" {% if current_category == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-5">
+      <label class="form-label">Sortieren nach</label>
+      <select name="sort" class="form-control" onchange="this.form.submit()">
+        <option value="date" {% if current_sort == 'date' %}selected{% endif %}>Neueste zuerst</option>
+        <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>Best bewertet</option>
+      </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <a href="{{ url_for('recipes.index') }}" class="btn btn-secondary w-100">Zurücksetzen</a>
+    </div>
+  </form>
+</div>
+
+<div class="row">
+  {% for recipe in recipes %}
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm h-100">
+        <img
+          src="{{ recipe.image_url if recipe.image_url else 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1200&auto=format&fit=crop' }}"
+          class="card-img-top"
+          alt="{{ recipe.title }}"
+          style="height: 160px; object-fit: cover;"
+        >
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="card-title mb-0">{{ recipe.title }}</h5>
+            {% if recipe.category %}
+              <span class="badge text-bg-secondary">{{ recipe.category }}</span>
+            {% endif %}
+          </div>
+
+          <h6 class="card-subtitle text-muted mb-2">von {{ recipe.author.username }}</h6>
+
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="text-warning">
+              {% for i in range(5) %}
+                {% if i < recipe.average_rating() %}
+                  ★
+                {% else %}
+                  ☆
+                {% endif %}
+              {% endfor %}
+              <small class="text-muted">({{ recipe.rating_count() }})</small>
+            </div>
+            <div class="small text-danger">♥ {{ recipe.favorites.count() }}</div>
+          </div>
+
+          {% if recipe.description %}
+            <p class="card-text mb-2">{{ recipe.description[:120] }}{% if recipe.description|length > 120 %}...{% endif %}</p>
+          {% endif %}
+
+          <div class="small text-muted">
+            {% if recipe.duration_min %}<span class="me-2">⏱ {{ recipe.duration_min }} Min</span>{% endif %}
+            {% if recipe.difficulty %}<span class="me-2">⚙️ {{ recipe.difficulty }}</span>{% endif %}
+            <span>💬 {{ recipe.comments.count() }} Kommentare</span>
+          </div>
+        </div>
+
+        <div class="card-footer d-flex justify-content-between align-items-center">
+          <a href="{{ url_for('recipes.view', recipe_id=recipe.id) }}" class="btn btn-sm btn-outline-primary">Ansehen</a>
+
+          {% if favorite_ids is defined %}
+            {% if recipe.id in favorite_ids %}
+              <form method="POST" action="{{ url_for('recipes.unfavorite', recipe_id=recipe.id) }}" class="mb-0">
+                <button type="submit" class="btn btn-sm btn-outline-danger">♥️ Entfernen</button>
+              </form>
+            {% else %}
+              <form method="POST" action="{{ url_for('recipes.favorite', recipe_id=recipe.id) }}" class="mb-0">
+                <button type="submit" class="btn btn-sm btn-outline-success">♡ Favorit</button>
+              </form>
+            {% endif %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <p>Keine Rezepte vorhanden.</p>
+  {% endfor %}
+</div>
+{% endblock %}
